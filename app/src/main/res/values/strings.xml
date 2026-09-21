@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Jualan</string>
+    <string name="about_title">Tentang Jualan</string>
+    <string name="about_heading">Tentang Jualan</string>
+    <string name="about_description">Aplikasi Jualan adalah platform yang mewadahi produk lokal UMKM di wilayah Kabupaten Purbalingga, Jawa Tengah.</string>
+    <string name="mission_label">Misi Kami:</string>
+    <string name="mission_value">Memajukan UMKM Lokal</string>
+    <string name="contact_us">Hubungi Kami</string>
+    <string name="email_label">Email Anda</string>
+    <string name="message_label">Pesan</string>
+    <string name="send_message">Kirim Pesan</string>
+    <string name="message_sent">Pesan Terkirim</string>
+    <string name="back">Kembali</string>
+    <string name="app_logo_description">Logo aplikasi</string>
 </resources>
