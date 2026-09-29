@@ -8,10 +8,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.navArgument
 import com.example.myapplication.ui.screen.DaftarProdukScreen
 import com.example.myapplication.ui.screen.DetailProductScreen
 import com.example.myapplication.ui.screen.HubungiKamiScreen
+import com.example.myapplication.ui.viewmodel.ProductViewModel
 import com.example.myapplication.ui.theme.JualanTheme
 
 class HomeActivity : ComponentActivity() {
@@ -21,6 +23,7 @@ class HomeActivity : ComponentActivity() {
         setContent {
             JualanTheme {
                 val navController = rememberNavController()
+                val productViewModel: ProductViewModel = viewModel()
 
                 NavHost(
                     navController = navController,
@@ -31,7 +34,8 @@ class HomeActivity : ComponentActivity() {
                             navController = navController,
                             onContactUsClick = {
                                 navController.navigate(CONTACT_FORM_ROUTE)
-                            }
+                            },
+                            viewModel = productViewModel
                         )
                     }
                     composable(
@@ -44,7 +48,8 @@ class HomeActivity : ComponentActivity() {
                     ) { backStackEntry ->
                         DetailProductScreen(
                             navController = navController,
-                            productId = backStackEntry.arguments?.getInt("productId") ?: 0
+                            productId = backStackEntry.arguments?.getInt("productId") ?: 0,
+                            viewModel = productViewModel
                         )
                     }
                     composable(CONTACT_FORM_ROUTE) {

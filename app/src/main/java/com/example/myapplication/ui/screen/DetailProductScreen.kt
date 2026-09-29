@@ -1,7 +1,5 @@
 package com.example.myapplication.ui.screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,34 +19,73 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.myapplication.R
-import com.example.myapplication.data.dummy.DummyData
 import com.example.myapplication.data.model.Product
-import com.example.myapplication.ui.theme.JualanTheme
+import com.example.myapplication.ui.viewmodel.ProductUiState
+import com.example.myapplication.ui.viewmodel.ProductViewModel
+import com.example.myapplication.util.JualanConstants
 
 @Composable
 fun DetailProductScreen(
     navController: NavController?,
     productId: Int,
+    viewModel: ProductViewModel,
     modifier: Modifier = Modifier
 ) {
-    val product = DummyData.products.find { it.id == productId }
+    val uiState by viewModel.uiState.collectAsState()
 
-    StatelessDetailProduct(
-        product = product,
-        onNavigateBack = { navController?.popBackStack() },
-        modifier = modifier
-    )
+    when (val state = uiState) {
+        ProductUiState.Loading -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is ProductUiState.Error -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
+        is ProductUiState.Success -> {
+            val product = state.products.find { it.id == productId }
+
+            if (product == null) {
+                Box(
+                    modifier = modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Produk tidak ditemukan")
+                }
+            } else {
+                StatelessDetailProduct(
+                    product = product,
+                    onNavigateBack = { navController?.popBackStack() },
+                    modifier = modifier
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,30 +116,20 @@ fun StatelessDetailProduct(
             )
         }
     ) { innerPadding ->
-        if (product == null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Produk tidak ditemukan")
-            }
-        } else {
+        if (product != null) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(16.dp)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.dummy_product),
+                AsyncImage(
+                    model = "${JualanConstants.BASE_URL}img/${product.img}",
                     contentDescription = product.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White),
+                        .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Fit
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -132,16 +160,5 @@ fun StatelessDetailProduct(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DetailProductScreenPreview() {
-    JualanTheme {
-        StatelessDetailProduct(
-            product = DummyData.products.first(),
-            onNavigateBack = {}
-        )
     }
 }
